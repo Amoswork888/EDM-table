@@ -12,6 +12,7 @@ javascript:(function() {
     tableElement.style.backgroundColor = '#ffffff';
     tableElement.style.width = '100%';
     tableElement.style.maxWidth = '600px';
+    tableElement.style.margin = 'auto';
 
     subTableElement.forEach(function(subTable) {
         subTable.setAttribute('align', 'center');
