@@ -65,29 +65,37 @@ javascript:(function() {
         subTable.style.textAlign = 'center';
     });
     
+    /* 等待100毫秒後複製表格 */
+    const delayTime = 100;
+    setTimeout(function() {
+        /*找到table元素*/
+        let tableToCopy = document.querySelector('table');
 
-    /*找到table元素*/
-    let tableToCopy = document.querySelector('table');
+        /* 確認是否找到table元素 */
+        if (tableToCopy) {
+            /* 複製table及其子代的原始碼 */
+            let tableHtml = tableToCopy.outerHTML;
+            /* 建立一個textarea元素，並將複製的HTML放入其中 */
+            let textarea = document.createElement('textarea');
+            textarea.value = tableHtml;
+            /* 將textarea元素添加到body中 */
+            document.body.appendChild(textarea);
+            /* 選中textarea中的內容 */
+            textarea.select();
+            /* 執行複製到剪貼簿的命令 */
+            document.execCommand('copy');
+            /* 移除textarea元素 */
+            document.body.removeChild(textarea);
 
-    /* 確認是否找到table元素 */
-    if (tableToCopy) {
-        /* 複製table及其子代的原始碼 */
-        let tableHtml = tableToCopy.outerHTML;
-        /* 建立一個textarea元素，並將複製的HTML放入其中 */
-        let textarea = document.createElement('textarea');
-        textarea.value = tableHtml;
-        /* 將textarea元素添加到body中 */
-        document.body.appendChild(textarea);
-        /* 選中textarea中的內容 */
-        textarea.select();
-        /* 執行複製到剪貼簿的命令 */
-        document.execCommand('copy');
-        /* 移除textarea元素 */
-        document.body.removeChild(textarea);
+            alert('已複製 Table 元素到剪貼簿');
+        } else {
+            alert('未找到 Table 元素');
+        }
+    }, delayTime);
 
-        alert('已複製table元素到剪貼簿');
-    } else {
-        alert('未找到table元素');
-    }
+    
+
+
+
     
 })();
