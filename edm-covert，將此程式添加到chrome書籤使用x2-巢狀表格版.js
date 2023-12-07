@@ -5,11 +5,17 @@ javascript:(function() {
     let subTableElement = document.querySelectorAll('table table');
     let imgElements = document.querySelectorAll('img');
     let aLinks = document.querySelectorAll('a');
+    let footAs = document.querySelectorAll('tfoot a');
     let imgMaxWidth = 0; /*建立變數存放最大的圖片尺寸，以利設定為 table 寬度*/
 
     /*遍歷所有超連結，設定行高*/
     aLinks.forEach(function(aLink) {
         aLink.style.lineHeight = '1';
+    });
+    
+    /*遍歷所有tfoot中的超連結，設定行高*/
+    footAs.forEach(function(footA) {
+        footA.style.lineHeight = '20px';
     });
 
     /*遍歷所有圖片，抓取尺寸並設定到 img 及 td*/
