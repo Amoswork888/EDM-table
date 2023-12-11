@@ -65,6 +65,8 @@ javascript:(function() {
     tableElement.style.maxWidth = imgMaxWidth + 'px';
     tableElement.style.margin = '20px auto';
     tableElement.style.textAlign = 'center';
+    tableElement.style.borderCollapse = 'collapse';
+    tableElement.style.borderSpacing = '0';
     /*設定巢狀 table */
     subTableElement.forEach(function(subTable) {
         subTable.setAttribute('align', 'center');
@@ -75,6 +77,8 @@ javascript:(function() {
         subTable.style.width = '100%';
         subTable.style.maxWidth = imgMaxWidth + 'px';
         subTable.style.textAlign = 'center';
+        subTable.style.borderCollapse = 'collapse';
+        subTable.style.borderSpacing = '0';
     });
 
     /* 等待100毫秒後複製表格 */
