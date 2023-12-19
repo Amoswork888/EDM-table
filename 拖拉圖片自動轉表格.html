@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #dropArea {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #aaa;
+            text-align: center;
+            line-height: 200px;
+            margin: 20px auto;
+            cursor: pointer;
+        }
+
+        #copyCodeBtn {
+            display: none;
+            margin: auto;
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #copyCodeBtn:hover {
+            background-color: #45a049;
+        }
+
+        input[type="text"] {
+            display: flex;
+            margin: 0 auto;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+            font-size: 16px;
+            width: 300px;
+            outline: none;
+        }
+
+        input[type="text"]:hover {
+            border-color: #666;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4caf50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+        }
+
+        #output table {
+            margin: 0 auto;
+        }
+        #prefixInput {
+            width: 700px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="dropArea" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+        拖拉圖片到這裡
+    </div>
+    <input type="file" id="uploadInput" accept="image/*" style="display: none;">
+    <input type="text" id="prefixInput" placeholder="圖片路徑, e.g. https://www.tentenplus.com.tw/demos">
+    <button id="copyCodeBtn">複製原始碼</button>
+    <div id="preview"></div>
+
+
+    <script>
+        const imageUpload = document.getElementById("imageUpload");
+        const preview = document.getElementById("preview");
+        const dropArea = document.getElementById("dropArea");
+        const uploadInput = document.getElementById("uploadInput");
+        const prefixInput = document.getElementById("prefixInput");
+
+        let finalOutputHtml = ``;
+        let imgMaxWidth = 0;
+
+        uploadInput.addEventListener("change", handleImageUpload);
+
+        function handleImageUpload(e) {
+            const { files } = e.target;
+            if (files.length === 0) return;
+
+            renderTable(files);
+        }
+
+        function renderTable(files) {
+            let rowsPreview = "";
+            let rowsFinal = "";
+            Array.from(files).forEach((file, index) => {
+                let imgWidth = 0,
+                    imgHeight = 0;
+                const imageBlob = window.URL.createObjectURL(file);
+                const imgSrc = prefixInput.value
+                    ? `${prefixInput.value}/${file.name}`
+                    : file.name;
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = function (e) {
+                    const imageObject = new Image();
+                    imageObject.src = imageBlob;
+                    imageObject.onload = function (e) {
+                        imgWidth = imageObject.width / 2;
+                        imgHeight = imageObject.height / 2;
+                        if (imgWidth > imgMaxWidth) {
+                            imgMaxWidth = imgWidth;
+                        }
+                        rowsPreview += createCellTemplate({
+                            imgWidth,
+                            imgHeight,
+                            imgSrc: imageBlob
+                        });
+                        rowsFinal += createCellTemplate({ imgWidth, imgHeight, imgSrc });
+                        if (index === files.length - 1) {
+                            preview.innerHTML = `<table width="${imgMaxWidth}" align="center" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; width:100%; max-width:${imgMaxWidth}px; margin: 20px auto; text-align:center; border-collapse:collapse; border-spacing:0;">
+                            <tbody>${rowsPreview}</tbody>
+                            </table>`;
+
+                            finalOutputHtml = `<table width="${imgMaxWidth}" align="center" cellpadding="0" cellspacing="0" border="0" style="background-color:#ffffff; width:100%; max-width:${imgMaxWidth}px; margin: 20px auto; text-align:center; border-collapse:collapse; border-spacing:0;">
+                            <tbody> ${rowsFinal}</tbody>
+                            </table>`;
+                            setTimeout(() => {
+                                copyToClipboard();
+                            }, 500);
+                        }
+                    };
+                };
+            });
+        }
+
+        function createCellTemplate({ imgWidth, imgHeight, imgSrc }) {
+            return `<tr><td width="${imgWidth}" height="${imgHeight}" border="0" align="center" style="width:${imgWidth}px; height:${imgHeight}px; padding:0;"><img width="${imgWidth}" height="${imgHeight}" align="center" style="vertical-align:top; display:block; margin:0; padding:0; border:none;" src="${imgSrc}" /></td></tr>`;
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            dropArea.style.border = "2px dashed #333";
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            dropArea.style.border = "2px dashed #aaa";
+            const files = event.dataTransfer.files;
+            simulateFileInput(files);
+        }
+
+        function simulateFileInput(files) {
+            const event = new MouseEvent("change", {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            const newFileList = new DataTransfer();
+            for (const file of files) {
+                newFileList.items.add(file);
+            }
+
+            uploadInput.files = newFileList.files;
+
+            uploadInput.dispatchEvent(event);
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard
+                .writeText(finalOutputHtml)
+                .then(() => {
+                    alert(`這些原始碼已經被複製到剪貼簿！ ${finalOutputHtml}`);
+                    finalOutputHtml = ``;
+                })
+                .catch((err) => {
+                    console.error("複製原始碼到剪貼簿失敗了，請重新再試！", err);
+                });
+        }
+
+    </script>
+</body>
+
+</html>
